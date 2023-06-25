@@ -66,6 +66,8 @@
 				</configuration>
 			</plugin>
 		</plugins>
+
+		<finalName>infobip-chat-project</finalName>
 	</build>
 
 </project>

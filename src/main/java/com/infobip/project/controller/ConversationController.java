@@ -15,7 +15,7 @@ import java.util.Optional;
 @RequestMapping("/conversations")
 public class ConversationController {
 
-    ConversationService conversationService;
+    private final ConversationService conversationService;
 
     public ConversationController(ConversationService conversationService) {
         this.conversationService = conversationService;

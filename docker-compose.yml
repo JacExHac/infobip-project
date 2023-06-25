@@ -3,15 +3,15 @@ services:
   my-postgres-database:
     image: postgres
     ports:
-      - '5433:5432'
+      - '5444:5432'
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=mysecretpassword
-    container_name: my-postgres-database
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    container_name: postgres-container
     networks:
-      - lab3-network
+      - chat-project-network
 
-  infobip-project-app:
+  infobip-chat-project1:
     build:
       context: .
       dockerfile: Dockerfile
@@ -21,10 +21,26 @@ services:
       - my-postgres-database
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://my-postgres-database:5432/postgres
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=mysecretpassword
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
     networks:
-      - lab3-network
+      - chat-project-network
+
+
+  infobip-chat-project2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8081:8080'
+    depends_on:
+      - my-postgres-database
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://my-postgres-database:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+    networks:
+      - chat-project-network
 
 networks:
-  lab3-network:
+  chat-project-network:

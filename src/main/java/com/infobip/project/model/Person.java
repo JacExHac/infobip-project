@@ -28,4 +28,8 @@ public class Person {
     @Setter
     private List<Conversation> conversations;
 
+    public Person(String phoneNumber, Long fundAmount) {
+        this.phoneNumber = phoneNumber;
+        this.fundAmount = fundAmount;
+    }
 }
