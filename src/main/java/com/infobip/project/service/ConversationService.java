@@ -9,6 +9,7 @@ import com.infobip.project.model.Person;
 import com.infobip.project.repository.ConversationRepository;
 import com.infobip.project.repository.MessageRepository;
 import com.infobip.project.repository.PersonRepository;
+import com.infobip.project.utils.ConversationTimeoutTask;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import java.util.Optional;
 public class ConversationService {
 
     private Map<String, Conversation> activeConversations;
+    private Map<Conversation, ConversationTimeoutTask> activeTimeoutTasks;
     private final BillingProcedure billingProcedure;
     private final ConversationRepository conversationRepository;
     private final PersonRepository personRepository;
@@ -28,6 +30,8 @@ public class ConversationService {
 
     public ConversationService(BillingProcedure billingProcedure, ConversationRepository conversationRepository, PersonRepository personRepository, MessageRepository messageRepository) {
         this.activeConversations = new HashMap<>();
+        this.activeTimeoutTasks = new HashMap<>();
+
         this.billingProcedure = billingProcedure;
         this.conversationRepository = conversationRepository;
         this.personRepository = personRepository;
@@ -38,42 +42,47 @@ public class ConversationService {
         Optional<Person> sender = personRepository.findByPhoneNumber(messageReceived.getFrom());
         Conversation conversation = activeConversations.get(messageReceived.getFrom());
 
+        if(sender.isPresent()) {
+            if(conversation == null) {
+                if (billingProcedure.userHasFunds(sender.get())) {
+                    conversation = buildConversationEntity(messageReceived, sender.get());
 
-        if (conversation == null && sender.isPresent()) {
 
-            if(billingProcedure.userHasFunds(sender.get())) {
+                    conversationRepository.save(conversation);
 
-                conversation = buildConversationEntity(messageReceived, sender.get());
+                    activeConversations.put(messageReceived.getFrom(), conversation);
 
-                activeConversations.put(messageReceived.getFrom(), conversation);
+                    //maps the conversation and its reset value in memory
+                    ConversationTimeoutTask conversationTask = new ConversationTimeoutTask(this, conversation);
+                    conversationTask.startTimeout();
+                    activeTimeoutTasks.put(conversation, conversationTask);
 
-                conversationRepository.save(conversation);
 
-                ChargedUserStatus status = billingProcedure.chargeUser(sender.get());
-                //TODO use the status to handle errors
-            } else {
-                return "No funds";
+                    ChargedUserStatus status = billingProcedure.chargeUser(sender.get());
+                    // TODO: Use the status to handle errors
+                } else {
+                    return "No funds...";
+                }
             }
+        } else {
+            return "Your phone number isn't registered...";
         }
 
-        if(sender.isPresent()) {
-            Message message = buildMessageEntity(messageReceived.getText(), conversation);
 
-            // Add the message to the conversation
+        if (sender.isPresent()) {
+            Message message = buildMessageEntity(messageReceived.getText(), conversation);
             messageRepository.save(message);
+            activeTimeoutTasks.get(conversation).resetTimeout();
         }
 
         return messageReceived.getText();
-
     }
 
     private Message buildMessageEntity(String content, Conversation conversation) {
         Message message = new Message();
-
         message.setConversation(conversation);
         message.setContent(content);
         message.setTimestamp(LocalDateTime.now());
-
         return message;
     }
 
@@ -88,6 +97,17 @@ public class ConversationService {
         return conversation;
     }
 
+    public void closeConversation(Conversation conversation) {
 
+        // Update the end time of a conversation and update the database
+        conversation.setEndTime(LocalDateTime.now());
+        conversationRepository.save(conversation);
+
+        // Remove the conversation from the active conversations map and the task map
+        activeConversations.remove(conversation.getPerson().getPhoneNumber());
+
+        activeTimeoutTasks.remove(conversation);
+    }
 }
+
 
