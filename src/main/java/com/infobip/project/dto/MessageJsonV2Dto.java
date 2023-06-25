@@ -1,14 +1,16 @@
 package com.infobip.project.dto;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Map;
+
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessageJsonV1Dto {
-
+public class MessageJsonV2Dto {
     @Getter
     @Setter
     private String from;
@@ -19,14 +21,21 @@ public class MessageJsonV1Dto {
 
     @Getter
     @Setter
-    private String text;
+    private ContentV2 content;
+
+    @Getter
+    @Setter
+    private String displayName;
+
 
     @Override
     public String toString() {
-        return "MessageJsonV1Dto{" +
+        return "MessageJsonV2Dto{" +
                 "from='" + from + '\'' +
                 ", to='" + to + '\'' +
-                ", text='" + text + '\'' +
+                ", content=" + content +
+                ", displayName='" + displayName + '\'' +
                 '}';
     }
 }
+

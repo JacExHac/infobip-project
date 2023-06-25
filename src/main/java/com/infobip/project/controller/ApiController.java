@@ -21,7 +21,7 @@ public class ApiController {
     }
 
     @PostMapping("/v1")
-    public ResponseEntity<String> postRequest(@RequestBody MessageJsonV1Dto messageReceived) {
+    public ResponseEntity<String> postRequestv1(@RequestBody MessageJsonV1Dto messageReceived) {
 
         String responseMessage = conversationService.processMessage(messageReceived);
 
@@ -30,5 +30,15 @@ public class ApiController {
     }
 
 
-    //@PostMapping("/v2")
+    @PostMapping("/v2")
+    public ResponseEntity<String> postRequestv2(@RequestBody MessageJsonV1Dto messageReceived) {
+
+
+        MessageJsonV1Dto messageJsonV1Dto = new MessageJsonV1Dto(messageReceived.getFrom(), messageReceived.getTo(), messageReceived.getText());
+
+        String responseMessage = conversationService.processMessage(messageJsonV1Dto);
+
+
+        return ResponseEntity.ok(responseMessage);
+    }
 }
