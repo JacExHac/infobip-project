@@ -3,6 +3,7 @@ package com.infobip.project.service;
 import com.infobip.project.billing.BillingProcedure;
 import com.infobip.project.billing.ChargedUserStatus;
 import com.infobip.project.dto.ConversationDto;
+import com.infobip.project.dto.MessageDto;
 import com.infobip.project.dto.MessageJsonV1Dto;
 import com.infobip.project.model.Conversation;
 import com.infobip.project.model.Message;
@@ -15,10 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ConversationService {
@@ -116,13 +114,49 @@ public class ConversationService {
 
         if (conversationOptional.isPresent()) {
             Conversation conversation = conversationOptional.get();
+            List<Message> messages = messageRepository.findByConversation(conversation);
+
+
+            List<MessageDto> messageDtos = new ArrayList<>();
+            for (Message message : messages) {
+                messageDtos.add(new MessageDto(message.getContent(), message.getTimestamp()));
+            }
+
             ConversationDto conversationDto = new ConversationDto(conversation.getPerson().getPhoneNumber(),conversation.getReceiverId(),conversation.getStartTime(),conversation.getEndTime());
+            conversationDto.setMessages(messageDtos);
             return conversationDto;
         } else {
             return null;
         }
 
     }
+
+    public List<ConversationDto> getConversationsByTimeRange(LocalDateTime startTime, LocalDateTime endTime) {
+        List<Conversation> conversations = conversationRepository.findByStartTimeBetween(startTime, endTime);
+
+        List<ConversationDto> conversationDtos = new ArrayList<>();
+        for (Conversation conversation : conversations) {
+            ConversationDto conversationDto = new ConversationDto(conversation.getPerson().getPhoneNumber(), conversation.getReceiverId(), conversation.getStartTime(), conversation.getEndTime());
+
+            // Fetch messages for the conversation
+            List<Message> messages = messageRepository.findByConversation(conversation);
+
+            // Create a list to hold messageDto objects
+            List<MessageDto> messageDtos = new ArrayList<>();
+            for (Message message : messages) {
+                messageDtos.add(new MessageDto(message.getContent(), message.getTimestamp()));
+            }
+
+            // Set the list of messageDtos in the conversationDto
+            conversationDto.setMessages(messageDtos);
+
+            // Add the conversationDto to the list
+            conversationDtos.add(conversationDto);
+        }
+
+        return conversationDtos;
+    }
+
 }
 
 
