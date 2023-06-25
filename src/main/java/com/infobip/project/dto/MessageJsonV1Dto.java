@@ -5,8 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
-@NoArgsConstructor
+
 public class MessageJsonV1Dto {
 
     @Getter
@@ -20,6 +19,15 @@ public class MessageJsonV1Dto {
     @Getter
     @Setter
     private String text;
+
+    public MessageJsonV1Dto(String from, String to, String text) {
+        this.from = from;
+        this.to = to;
+        this.text = text;
+    }
+
+    public MessageJsonV1Dto() {
+    }
 
     @Override
     public String toString() {

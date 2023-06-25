@@ -1,28 +1,21 @@
 package com.infobip.project.dto;
 
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MessageJsonV2Dto {
+    @JsonProperty("from")
     private String from;
+
+    @JsonProperty("to")
     private String to;
+
+    @JsonProperty("content")
     private Content content;
+
+    @JsonProperty("displayName")
     private String displayName;
 
     public MessageJsonV2Dto() {
-
-    }
-
-    public MessageJsonV2Dto(String from, String to, String text, String displayName) {
-        this.from = from;
-        this.to = to;
-        this.content = new Content(text);
-        this.displayName = displayName;
     }
 
     public String getFrom() {
@@ -41,18 +34,12 @@ public class MessageJsonV2Dto {
         this.to = to;
     }
 
-    public String getText() {
-        if (content != null) {
-            return content.getText();
-        }
-        return null;
+    public Content getContent() {
+        return content;
     }
 
-    public void setText(String text) {
-        if (content == null) {
-            content = new Content();
-        }
-        content.setText(text);
+    public void setContent(Content content) {
+        this.content = content;
     }
 
     public String getDisplayName() {
@@ -64,14 +51,10 @@ public class MessageJsonV2Dto {
     }
 
     public static class Content {
+        @JsonProperty("text")
         private String text;
 
         public Content() {
-            // Default constructor
-        }
-
-        public Content(String text) {
-            this.text = text;
         }
 
         public String getText() {
@@ -88,10 +71,8 @@ public class MessageJsonV2Dto {
         return "MessageJsonV2Dto{" +
                 "from='" + from + '\'' +
                 ", to='" + to + '\'' +
-                ", content=" + content +
+                ", content=" + content.getText() +
                 ", displayName='" + displayName + '\'' +
                 '}';
     }
 }
-
-

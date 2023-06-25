@@ -36,13 +36,11 @@ public class ApiController {
     @PostMapping("/v2")
     public ResponseEntity<String> postRequestv2(@RequestBody MessageJsonV2Dto messageReceived) {
 
-        return ResponseEntity.ok(messageReceived.toString());
+        MessageJsonV1Dto messageJsonV1Dto = new MessageJsonV1Dto(messageReceived.getFrom(),messageReceived.getTo(),messageReceived.getContent().getText());
 
-       // MessageJsonV1Dto messageJsonV1Dto = new MessageJsonV1Dto(messageReceived.getFrom(), messageReceived.getTo(), messageReceived.getText());
-
-       // String responseMessage = conversationService.processMessage(messageJsonV1Dto);
+        String responseMessage = conversationService.processMessage(messageJsonV1Dto);
 
 
-        //return ResponseEntity.ok(messageJsonV1Dto.toString());
+        return ResponseEntity.ok(responseMessage);
     }
 }
