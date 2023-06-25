@@ -1,0 +1,30 @@
+version: '3'
+services:
+  my-postgres-database:
+    image: postgres
+    ports:
+      - '5433:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mysecretpassword
+    container_name: my-postgres-database
+    networks:
+      - lab3-network
+
+  infobip-project-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    depends_on:
+      - my-postgres-database
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://my-postgres-database:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=mysecretpassword
+    networks:
+      - lab3-network
+
+networks:
+  lab3-network:
