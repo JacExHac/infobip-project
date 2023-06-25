@@ -1,15 +1,13 @@
 package com.infobip.project.model;
 
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,25 +19,31 @@ public class Conversation {
     @Id
     @Getter
     @Setter
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long conversationId;
 
+    @ManyToOne
+    @JoinColumn(name = "person_phone_number", referencedColumnName = "phoneNumber")
     @Getter
     @Setter
-    private Long senderId;
+    private Person person;
 
     @Getter
     @Setter
-    private Long receiverId;
+    private String receiverId;
 
     @Getter
     @Setter
-    private Long startTime;
+    private LocalDateTime startTime;
 
     @Getter
     @Setter
-    private Long endTime;
+    private LocalDateTime endTime;
+
 
     @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Getter
+    @Setter
     private List<Message> messages = new ArrayList<>();
 
 }
