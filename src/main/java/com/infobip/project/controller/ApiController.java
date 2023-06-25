@@ -1,15 +1,18 @@
 package com.infobip.project.controller;
 
 import com.infobip.project.dto.MessageJsonV1Dto;
+import com.infobip.project.dto.MessageJsonV2Dto;
 import com.infobip.project.model.Conversation;
 import com.infobip.project.service.ConversationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("/api")
+@RestController("")
+@RequestMapping("/api")
 public class ApiController {
 
 
@@ -31,14 +34,15 @@ public class ApiController {
 
 
     @PostMapping("/v2")
-    public ResponseEntity<String> postRequestv2(@RequestBody MessageJsonV1Dto messageReceived) {
+    public ResponseEntity<String> postRequestv2(@RequestBody MessageJsonV2Dto messageReceived) {
+
+        return ResponseEntity.ok(messageReceived.toString());
+
+       // MessageJsonV1Dto messageJsonV1Dto = new MessageJsonV1Dto(messageReceived.getFrom(), messageReceived.getTo(), messageReceived.getText());
+
+       // String responseMessage = conversationService.processMessage(messageJsonV1Dto);
 
 
-        MessageJsonV1Dto messageJsonV1Dto = new MessageJsonV1Dto(messageReceived.getFrom(), messageReceived.getTo(), messageReceived.getText());
-
-        String responseMessage = conversationService.processMessage(messageJsonV1Dto);
-
-
-        return ResponseEntity.ok(responseMessage);
+        //return ResponseEntity.ok(messageJsonV1Dto.toString());
     }
 }

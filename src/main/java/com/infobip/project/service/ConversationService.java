@@ -2,6 +2,7 @@ package com.infobip.project.service;
 
 import com.infobip.project.billing.BillingProcedure;
 import com.infobip.project.billing.ChargedUserStatus;
+import com.infobip.project.dto.ConversationDto;
 import com.infobip.project.dto.MessageJsonV1Dto;
 import com.infobip.project.model.Conversation;
 import com.infobip.project.model.Message;
@@ -12,6 +13,7 @@ import com.infobip.project.repository.PersonRepository;
 import com.infobip.project.utils.ConversationTimeoutTask;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -107,6 +109,19 @@ public class ConversationService {
         activeConversations.remove(conversation.getPerson().getPhoneNumber());
 
         activeTimeoutTasks.remove(conversation);
+    }
+
+    public ConversationDto getConversationById(Long id) {
+        Optional<Conversation> conversationOptional = conversationRepository.findById(id);
+
+        if (conversationOptional.isPresent()) {
+            Conversation conversation = conversationOptional.get();
+            ConversationDto conversationDto = new ConversationDto(conversation.getPerson().getPhoneNumber(),conversation.getReceiverId(),conversation.getStartTime(),conversation.getEndTime());
+            return conversationDto;
+        } else {
+            return null;
+        }
+
     }
 }
 
