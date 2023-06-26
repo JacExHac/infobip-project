@@ -4,14 +4,24 @@ import com.infobip.project.dto.PersonDto;
 import com.infobip.project.model.Person;
 import com.infobip.project.repository.PersonRepository;
 import com.infobip.project.service.ConversationService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+
 @RestController()
 @RequestMapping("/persons")
 public class PersonController {
+
+
+    private static final Logger logger = LoggerFactory.getLogger(PersonController.class);
 
 
     private final PersonRepository personRepository;
@@ -31,6 +41,16 @@ public class PersonController {
 
     @GetMapping()
     public List<PersonDto> getAllPersons() {
+
+
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = attributes.getRequest();
+
+        // Retrieve the port number from the request
+        int port = request.getLocalPort();
+        String address = request.getLocalAddr();
+
+        logger.info("Fetching all persons from IP:port ==> " + address + ":" + port);
         List<Person> persons= personRepository.findAll();
         List<PersonDto> personDtos = new ArrayList<>();
 
@@ -40,6 +60,7 @@ public class PersonController {
             personDto.setFundAmount(person.getFundAmount());
             personDtos.add(personDto);
         }
+
 
         return personDtos;
 
